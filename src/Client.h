@@ -8,11 +8,13 @@ typedef struct{
     int id;
     char nom[30];
     char prenom[30];
+    int cin;
     int sexe;
     int tel;
     char email[50];
     int notif;
     char mdp[50];
+    char ville[30];
 }Compte;
 
 int AjouterCompte(char* ficher, Compte c);

@@ -4,14 +4,30 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include"
+                "/usr/include",
+                "/usr/include/gtk-2.0",
+                "/usr/include/glib-2.0",
+                "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
+                "/usr/include/cairo",
+                "/usr/include/pango-1.0",
+                "/usr/include/harfbuzz",
+                "/usr/lib/x86_64-linux-gnu/gtk-2.0/include",
+                "/usr/include/gdk-pixbuf-2.0",
+                "/usr/include/atk-1.0"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-x64",
-            "configurationProvider": "ms-vscode.makefile-tools"
+            "configurationProvider": "ms-vscode.makefile-tools",
+            "browse": {
+                "path": [
+                    "/usr/include/*",
+                    "/usr/include/gtk-2.0"
+                ]
+            },
+            "mergeConfigurations": false
         }
     ],
     "version": 4

@@ -100,7 +100,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_projet_OBJECTS = main.$(OBJEXT) support.$(OBJEXT) \
-	interface.$(OBJEXT) callbacks.$(OBJEXT) Agent.$(OBJEXT)
+	interface.$(OBJEXT) callbacks.$(OBJEXT) Agent.$(OBJEXT) \
+	Client.$(OBJEXT)
 projet_OBJECTS = $(am_projet_OBJECTS)
 am__DEPENDENCIES_1 =
 projet_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -119,9 +120,9 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/Agent.Po ./$(DEPDIR)/callbacks.Po \
-	./$(DEPDIR)/interface.Po ./$(DEPDIR)/main.Po \
-	./$(DEPDIR)/support.Po
+am__depfiles_remade = ./$(DEPDIR)/Agent.Po ./$(DEPDIR)/Client.Po \
+	./$(DEPDIR)/callbacks.Po ./$(DEPDIR)/interface.Po \
+	./$(DEPDIR)/main.Po ./$(DEPDIR)/support.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -285,7 +286,8 @@ projet_SOURCES = \
 	support.c support.h \
 	interface.c interface.h \
 	callbacks.c callbacks.h \
-	Agent.c Agent.h
+	Agent.c Agent.h \
+	Client.c Client.h
 
 projet_LDADD = -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lharfbuzz -lfontconfig -lfreetype $(INTLLIBS)
 all: all-am
@@ -375,6 +377,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/Agent.Po # am--include-marker
+include ./$(DEPDIR)/Client.Po # am--include-marker
 include ./$(DEPDIR)/callbacks.Po # am--include-marker
 include ./$(DEPDIR)/interface.Po # am--include-marker
 include ./$(DEPDIR)/main.Po # am--include-marker
@@ -528,6 +531,7 @@ clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/Agent.Po
+	-rm -f ./$(DEPDIR)/Client.Po
 	-rm -f ./$(DEPDIR)/callbacks.Po
 	-rm -f ./$(DEPDIR)/interface.Po
 	-rm -f ./$(DEPDIR)/main.Po
@@ -578,6 +582,7 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/Agent.Po
+	-rm -f ./$(DEPDIR)/Client.Po
 	-rm -f ./$(DEPDIR)/callbacks.Po
 	-rm -f ./$(DEPDIR)/interface.Po
 	-rm -f ./$(DEPDIR)/main.Po

@@ -53,4 +53,13 @@ void AfficherAgents(char* filename);
 int ChercherAgent(char* filename, char* id, Agent* );
 void ListeReservation(char * filename, int id_parking, Date date);
 
+// typedef struct AgentReader AgentReader;
+
+// void initReader(AgentReader* r, char* filepath);
+// Agent ReadNext(AgentReader* r);
+// Agent PeekNext(AgentReader* r);
+// int GetCurrentLine(AgentReader r);
+// FILE* GetFile(AgentReader r);
+// void Foreach(AgentReader* r,void(*Predicate)(Agent));
+
 #endif // AGENT_H_INCLUDED

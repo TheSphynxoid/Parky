@@ -10,7 +10,7 @@ int AjouterAgent(char* filename, Agent agent){
             agent.etat_civil, agent.nombre_enfant);
     }
     else{
-        printf("L'agent existe deja dans la base de donneés\n");
+        printf("L'agent existe deja dans la base de donneï¿½s\n");
     }
     fclose(f);
     return 0;
@@ -93,7 +93,7 @@ void AfficherAgents(char* filename){
     }
 }
 
-//Retourne 1 Si agent n'est pas trouvé.
+//Retourne 1 Si agent n'est pas trouvï¿½.
 int ChercherAgent(char* filename, char* id, Agent* agent){
     //si rAgent == NULL, on simplement fait un recherche sans retourner une valeur.
     Agent back;

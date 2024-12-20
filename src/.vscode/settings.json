@@ -8,6 +8,7 @@
         }
     ],
     "files.associations": {
-        "agent.h": "c"
+        "agent.h": "c",
+        "gtk.h": "c"
     }
 }
