@@ -5,4 +5,3 @@
 GtkWidget* create_G4_PARKY (void);
 GtkWidget* create_Auth (void);
 GtkWidget* create_window2 (void);
-GtkWidget* create_G4_PARKY_client();

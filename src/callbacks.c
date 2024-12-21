@@ -830,30 +830,85 @@ on_button70_clicked                    (GtkWidget       *button,
 
 }
 
-void
-on_Rl_buttonSupp_clicked               (GtkWidget       *button,
-                                        gpointer         user_data)
+void on_Rl_buttonSupp_clicked(GtkWidget *button, gpointer user_data)
 {
-	GtkWidget* parkingtree = lookup_widget(button, "treeviewParking_RL");
+    GtkWidget *parkingtree = lookup_widget(button, "treeviewParking_RL");
 
-    GtkTreeModel* model;
+    GtkTreeModel *model;
     GtkTreeIter iter;
-   
-    GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(parkingtree));
-    if(gtk_tree_selection_get_selected(selection, &model, &iter)){
-		g_print("Aucune Selection\n");
-	}
 
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(parkingtree));
 
+    if (!gtk_tree_selection_get_selected(selection, &model, &iter))
+    {
+        // Aucun parking sélectionné
+        GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
+                                                   GTK_DIALOG_MODAL,
+                                                   GTK_MESSAGE_INFO,
+                                                   GTK_BUTTONS_OK,
+                                                   "Aucun parking sélectionné.");
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+        return;
+    }
+
+    // Récupérer l'ID du parking sélectionné
     int id;
     gtk_tree_model_get(model, &iter, 0, &id, -1);
 
- int resultat = supprimer("parking.txt", id);
- if(resultat ==1){
- printf("parking supp avec succée");
-}else{ printf("erreur");}
-on_actualiser1_RL_clicked(button, user_data);
+    // Demander confirmation avant suppression
+    GtkWidget *confirm_dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
+                                                       GTK_DIALOG_MODAL,
+                                                       GTK_MESSAGE_QUESTION,
+                                                       GTK_BUTTONS_YES_NO,
+                                                       "Voulez-vous vraiment supprimer ce parking ?");
+    gint response = gtk_dialog_run(GTK_DIALOG(confirm_dialog));
+    gtk_widget_destroy(confirm_dialog);
+
+    if (response == GTK_RESPONSE_YES)
+    {
+        // Appeler la fonction de suppression
+        int resultat = supprimer("parking.txt", id);
+        if (resultat == 1)
+        {
+            // Afficher un message de succès
+            GtkWidget *success_dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
+                                                               GTK_DIALOG_MODAL,
+                                                               GTK_MESSAGE_INFO,
+                                                               GTK_BUTTONS_OK,
+                                                               "Parking supprimé avec succès !");
+            gtk_dialog_run(GTK_DIALOG(success_dialog));
+            gtk_widget_destroy(success_dialog);
+        }
+        else
+        {
+            // Afficher un message d'erreur
+            GtkWidget *error_dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
+                                                             GTK_DIALOG_MODAL,
+                                                             GTK_MESSAGE_ERROR,
+                                                             GTK_BUTTONS_OK,
+                                                             "Erreur lors de la suppression du parking.");
+            gtk_dialog_run(GTK_DIALOG(error_dialog));
+            gtk_widget_destroy(error_dialog);
+        }
+
+        // Actualiser l'interface après suppression
+        on_actualiser1_RL_clicked(button, user_data);
+    }
+    else
+    {
+        // Message d'annulation
+        GtkWidget *cancel_dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
+                                                          GTK_DIALOG_MODAL,
+                                                          GTK_MESSAGE_INFO,
+                                                          GTK_BUTTONS_OK,
+                                                          "Suppression annulée.");
+        gtk_dialog_run(GTK_DIALOG(cancel_dialog));
+        gtk_widget_destroy(cancel_dialog);
+    }
 }
+
+
 
 
 void
@@ -1043,7 +1098,7 @@ void on_RL_buttonR_clicked(GtkWidget *button, gpointer user_data) {
 
 
 
- void on_RL_BCom_clicked(GtkWidget *button, gpointer user_data)
+void on_RL_BCom_clicked(GtkWidget *button, gpointer user_data)
 {
     PARKING p;
     GtkWidget *input1, *input2, *input3, *input4, *input5, *input6, *input7, *input8;
@@ -1059,9 +1114,12 @@ void on_RL_buttonR_clicked(GtkWidget *button, gpointer user_data) {
     input7 = lookup_widget(button, "nb_RL");
     input8 = lookup_widget(button, "horaire_RL");
 
-    // Validation des champs obligatoires
+    // Validation des champs obligatoires et du format de l'identifiant
     const gchar *id_text = gtk_entry_get_text(GTK_ENTRY(input1));
-    if (strlen(id_text) == 0) {
+
+    // Vérifier que le champ ID n'est pas vide
+    if (strlen(id_text) == 0)
+    {
         message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
                                                 "L'identifiant ne peut pas être vide.");
         gtk_dialog_run(GTK_DIALOG(message_dialog));
@@ -1069,7 +1127,21 @@ void on_RL_buttonR_clicked(GtkWidget *button, gpointer user_data) {
         return;
     }
 
-    p.id_parking = atoi(id_text);
+    // Vérifier que l'identifiant est un entier
+    char *endptr;
+    long id_value = strtol(id_text, &endptr, 10);
+    if (*endptr != '\0' || id_value <= 0)
+    {
+        message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+                                                "L'identifiant doit être un entier valide.");
+        gtk_dialog_run(GTK_DIALOG(message_dialog));
+        gtk_widget_destroy(message_dialog);
+        return;
+    }
+
+    p.id_parking = (int)id_value;
+
+    // Remplir les autres champs
     strcpy(p.nom_parking, gtk_entry_get_text(GTK_ENTRY(input2)));
     strcpy(p.adresse, gtk_entry_get_text(GTK_ENTRY(input3)));
     p.capacite = gtk_spin_button_get_value_as_int((GtkSpinButton *)input4);
@@ -1081,19 +1153,22 @@ void on_RL_buttonR_clicked(GtkWidget *button, gpointer user_data) {
     p.moyenne = 0;
     snprintf(p.cin_agent, sizeof(p.cin_agent), "00000000");
     p.statut = statut;
-	PARKING cherche = chercher("parking.txt", p.id_parking);
-    if (cherche.id_parking != -1) {
+
+    // Vérifier si l'ID existe déjà
+    PARKING cherche = chercher("parking.txt", p.id_parking);
+    if (cherche.id_parking != -1)
+    {
         // Parking déjà existant, demande de confirmation de modification
         GtkWidget *dialog;
         gint response;
 
         dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-                                        "Voulez-vous vraiment modifier ?");
+                                        "Un parking avec cet identifiant existe déjà. Voulez-vous vraiment modifier ?");
         response = gtk_dialog_run(GTK_DIALOG(dialog));
 
-
-        if (response == GTK_RESPONSE_YES) {
-			strcpy(p.cin_agent, cherche.cin_agent);
+        if (response == GTK_RESPONSE_YES)
+        {
+            strcpy(p.cin_agent, cherche.cin_agent);
             modifier("parking.txt", p.id_parking, p);
             message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
                                                     "Modification réussie.");
@@ -1101,15 +1176,19 @@ void on_RL_buttonR_clicked(GtkWidget *button, gpointer user_data) {
             gtk_widget_destroy(message_dialog);
         }
         gtk_widget_destroy(dialog);
-    } else {
+    }
+    else
+    {
         // Nouveau parking, tentative d'ajout
-        if (ajouter("parking.txt", p)) {
+        if (ajouter("parking.txt", p))
+        {
             message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
                                                     "Ajout réussi.");
-			on_comboboxParky_RL_map(GTK_COMBO_BOX(lookup_widget(button, "comboboxParky_RL")));
-			on_actualiser1_RL_clicked(button, user_data);
-			
-        } else {
+            on_comboboxParky_RL_map(GTK_COMBO_BOX(lookup_widget(button, "comboboxParky_RL")));
+            on_actualiser1_RL_clicked(button, user_data);
+        }
+        else
+        {
             message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
                                                     "Erreur lors de l'ajout du parking.");
         }
@@ -1157,7 +1236,10 @@ void on_RL_Affecter_clicked(GtkWidget *button, gpointer user_data) {
     // Obtenir le CIN de l'agent sélectionné dans le TreeView
     GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview_agents));
     if (!gtk_tree_selection_get_selected(selection, &model, &iter)) {
-        g_warning("Erreur : Aucun agent sélectionné.\n");
+        GtkWidget *message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+                                                           "Erreur : Aucun agent sélectionné.");
+        gtk_dialog_run(GTK_DIALOG(message_dialog));
+        gtk_widget_destroy(message_dialog);
         return;
     }
     gtk_tree_model_get(model, &iter, 0, &selected_cin_agent, -1); // Colonne 0 = CIN
@@ -1165,17 +1247,22 @@ void on_RL_Affecter_clicked(GtkWidget *button, gpointer user_data) {
     // Obtenir l'ID du parking sélectionné dans le ComboBox
     selected_id_parking = gtk_combo_box_get_active_text(GTK_COMBO_BOX(combobox_parking));
     if (!selected_id_parking) {
-        g_warning("Erreur : Aucun parking sélectionné.\n");
+        GtkWidget *message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+                                                           "Erreur : Aucun parking sélectionné.");
+        gtk_dialog_run(GTK_DIALOG(message_dialog));
+        gtk_widget_destroy(message_dialog);
         g_free(selected_cin_agent);
         return;
     }
-   
-    
+
     // Mettre à jour le fichier parking.txt
     FILE *file = fopen("parking.txt", "r");
     FILE *temp = fopen("temp_parking.txt", "w");
     if (!file || !temp) {
-        g_warning("Erreur lors de l'ouverture des fichiers.\n");
+        GtkWidget *message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+                                                           "Erreur lors de l'ouverture des fichiers.");
+        gtk_dialog_run(GTK_DIALOG(message_dialog));
+        gtk_widget_destroy(message_dialog);
         g_free(selected_cin_agent);
         g_free(selected_id_parking);
         return;
@@ -1209,6 +1296,12 @@ void on_RL_Affecter_clicked(GtkWidget *button, gpointer user_data) {
 
     g_free(selected_cin_agent);
     g_free(selected_id_parking);
+
+    // Afficher un message de confirmation
+    GtkWidget *message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+                                                       "Affectation réussie !");
+    gtk_dialog_run(GTK_DIALOG(message_dialog));
+    gtk_widget_destroy(message_dialog);
 
     printf("Affectation réussie.\n");
 }
@@ -1260,6 +1353,7 @@ void on_chercher_RL_clicked(GtkWidget *button, gpointer user_data) {
     GtkTreeIter iter;
     int r;
     gboolean valid;
+    gboolean id_found = FALSE;
 
     // Get the ID entered by the user
     idEntry = lookup_widget(button, "idRecherche_RL");
@@ -1267,9 +1361,16 @@ void on_chercher_RL_clicked(GtkWidget *button, gpointer user_data) {
 
     // Search for the parking entry with the given ID
     p = chercher("parking.txt", r);
-    printf("%d %s %s %d %d %d %d %.2f %s %d %.2f %d\n",
-           p.id_parking, p.nom_parking, p.adresse, p.capacite,
-           p.type, p.nb_place, p.horaire, p.tarif, p.cin_agent, p.service_off, p.moyenne, p.statut);
+
+    // Check if the ID exists in the file
+    if (p.id_parking == -1) {
+        // Display an error message
+        GtkWidget *message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+                                                           "L'identifiant recherché n'existe pas.");
+        gtk_dialog_run(GTK_DIALOG(message_dialog));
+        gtk_widget_destroy(message_dialog);
+        return;
+    }
 
     // Get the TreeView widget
     treeview = lookup_widget(button, "treeviewParking_RL");
@@ -1288,13 +1389,23 @@ void on_chercher_RL_clicked(GtkWidget *button, gpointer user_data) {
             // Select the matching row
             GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
             gtk_tree_selection_select_iter(selection, &iter);
+            id_found = TRUE;
             break;
         }
 
         // Move to the next row
         valid = gtk_tree_model_iter_next(model, &iter);
     }
+
+    // Display an error message if the ID was not found in the TreeView
+    if (!id_found) {
+        GtkWidget *message_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+                                                           "L'identifiant recherché n'est pas affiché dans la liste.");
+        gtk_dialog_run(GTK_DIALOG(message_dialog));
+        gtk_widget_destroy(message_dialog);
+    }
 }
+
 
 
 
