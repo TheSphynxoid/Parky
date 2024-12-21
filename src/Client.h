@@ -21,6 +21,6 @@ int AjouterCompte(char* ficher, Compte c);
 int ModiferCompte(char* ficher, Compte c);
 int SupprimerCompte(char* ficher, int id);
 Compte ChercherCompte(char* ficher, int id);
-float FactureMensuelle(char* fichier, int mois, int annee);
+float FactureMensuelle(char* fichier, int mois, int annee,int cin);
 
 #endif

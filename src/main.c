@@ -15,7 +15,7 @@
 int
 main (int argc, char *argv[])
 {
-  GtkWidget *G4_PARKY;
+  GtkWidget *Auth;
 
 #ifdef ENABLE_NLS
   bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
@@ -33,9 +33,10 @@ main (int argc, char *argv[])
    * (except popup menus), just so that you see something after building
    * the project. Delete any components that you don't want shown initially.
    */
-  G4_PARKY = create_G4_PARKY ();
-  gtk_widget_show (G4_PARKY);
-
+  // G4_PARKY = create_G4_PARKY ();
+  // gtk_widget_show (G4_PARKY);
+  Auth = create_Auth();
+  gtk_widget_show(Auth);
   gtk_main ();
   return 0;
 }

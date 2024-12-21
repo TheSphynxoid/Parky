@@ -1,4 +1,5 @@
 #include "Client.h"
+#include "Agent.h"
 #include <string.h>
 
 int AjouterCompte(char* ficher, Compte c){
@@ -7,7 +8,7 @@ int AjouterCompte(char* ficher, Compte c){
         printf("Erreur d'overture de fichier");
         return 0;
     }
-    fprintf(f, "%d %s %s %d %d %s %d %d %s\n", c.id, c.nom, c.prenom, c.cin, c.sexe, c.email, c.tel, c.notif, c.mdp);
+    fprintf(f, "%d %s %s %d %d %s %d %d %s %s\n", c.id, c.nom, c.prenom, c.cin, c.sexe, c.email, c.tel, c.notif, c.mdp, c.ville);
     fclose(f);
     return 1;
 }
@@ -20,13 +21,13 @@ int ModiferCompte(char* ficher, Compte nouv){
         printf("Erreur d'overture de fichier");
         return -1;
     }
-    while(fscanf(f, "%d %s %s %d %d %s %d %d %s\n", &c.id, c.nom, c.prenom, &c.cin, &c.sexe, c.email, &c.tel, &c.notif, c.mdp) != EOF){
+    while(fscanf(f, "%d %s %s %d %d %s %d %d %s %s\n", &c.id, c.nom, c.prenom, &c.cin, &c.sexe, c.email, &c.tel, &c.notif, c.mdp, c.ville) != EOF){
         if(c.id == nouv.id){
-            fprintf(temp, "%d %s %s %d %d %s %d %d %s\n", nouv.id, nouv.nom, nouv.prenom, nouv.cin, nouv.sexe, nouv.email, nouv.tel, nouv.notif, nouv.mdp);
+            fprintf(temp, "%d %s %s %d %d %s %d %d %s %s\n", nouv.id, nouv.nom, nouv.prenom, nouv.cin, nouv.sexe, nouv.email, nouv.tel, nouv.notif, nouv.mdp,nouv.ville);
             modif = 1;
         }
         else{
-            fprintf(temp, "%d %s %s %d %d %s %d %d %s\n", c.id, c.nom, c.prenom, c.cin, c.sexe, c.email, c.tel, c.notif, c.mdp);
+            fprintf(temp, "%d %s %s %d %d %s %d %d %s %s\n", c.id, c.nom, c.prenom, c.cin, c.sexe, c.email, c.tel, c.notif, c.mdp, c.ville);
         }
     }
     fclose(f);
@@ -45,9 +46,9 @@ int SupprimerCompte(char *ficher, int id)
         printf("Erreur d'overture de fichier");
         return -1;
     }
-    while(fscanf(f, "%d %s %s %d %d %s %d %d %s\n", &c.id, c.nom, c.prenom, &c.cin, &c.sexe, c.email, &c.tel, &c.notif, c.mdp) != EOF){
+    while(fscanf(f, "%d %s %s %d %d %s %d %d %s %s\n", &c.id, c.nom, c.prenom, &c.cin, &c.sexe, c.email, &c.tel, &c.notif, c.mdp, c.ville) != EOF){
         if(c.id != id){
-            fprintf(temp, "%d %s %s %d %d %s %d %d %s\n", c.id, c.nom, c.prenom, c.cin, c.sexe, c.email, c.tel, c.notif, c.mdp);
+            fprintf(temp, "%d %s %s %d %d %s %d %d %s %s\n", c.id, c.nom, c.prenom, c.cin, c.sexe, c.email, c.tel, c.notif, c.mdp, c.ville);
             supprimer = 1;
         }
     }
@@ -61,7 +62,7 @@ Compte ChercherCompte(char *ficher, int id)
 {
     FILE* f = fopen(ficher, "r");
     Compte c;
-    while(fscanf(f, "%d %s %s %d %d %s %d %d %s\n", &c.id, c.nom, c.prenom, &c.cin, &c.sexe, c.email, &c.tel, &c.notif, c.mdp) != EOF){
+    while(fscanf(f, "%d %s %s %d %d %s %d %d %s %s\n", &c.id, c.nom, c.prenom, &c.cin, &c.sexe, c.email, &c.tel, &c.notif, c.mdp, c.ville) != EOF){
         if(c.id == id){
             return c;
         }
@@ -69,6 +70,19 @@ Compte ChercherCompte(char *ficher, int id)
     c.id = -1;
     return c;
 }
-float FactureMensuelle(char* fichier, int mois, int annee){
-    
+float FactureMensuelle(char* fichier, int mois, int annee, int cin){
+	float total=0;
+	FILE* file = fopen(fichier, "r");
+Reservation reservation;
+    while(fscanf(file, "%d %s %s %s %d %d %d %d/%d/%d/%d %d/%d/%d/%d %f\n",
+            &reservation.ID_Parking, reservation.nom_parking, reservation.nom, reservation.prenom, &reservation.numero,
+            &reservation.CIN, &reservation.immatricule, &reservation.arr_jour, &reservation.arr_mois, &reservation.arr_annee,  &reservation.arr_heure,
+            &reservation.dep_jour, &reservation.dep_mois, &reservation.dep_annee,  &reservation.dep_heure, &reservation.prix) != EOF){
+
+		if(reservation.CIN == cin){
+	    total+=reservation.prix;
+		}
+	}
+
+   return total; 
 }
